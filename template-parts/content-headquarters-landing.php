@@ -79,7 +79,7 @@ $current_lang = apply_filters( 'wpml_object_id', 14, 'post' );
 
                                 <div class="count" data-target="10000">0</div>
 
-                                <p>Mobiliario servido</p>
+                                <p><?php _e('Served furniture: ', 'ws'); ?></p>
 
                             </div>
 
@@ -87,7 +87,7 @@ $current_lang = apply_filters( 'wpml_object_id', 14, 'post' );
 
                                 <div class="count" data-target="3000">0</div>
 
-                                <p>Eventos realizados</p>
+                                <p><?php _e('Events held: ', 'ws'); ?></p>
 
                             </div>
 
@@ -156,7 +156,7 @@ $current_lang = apply_filters( 'wpml_object_id', 14, 'post' );
                             counters.forEach(counter => observer.observe(counter));
 
                             });
-                            
+
                         </script>
 
                     </div>
