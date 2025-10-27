@@ -7648,3 +7648,18 @@ footer#colophon .footer-2 { gap: 40px; }
 
 
         }
+
+
+/* HEADQUARTER LANDING */
+
+    .page-template-hacemos-page .headquarter { padding-top: 100px; }
+
+    .page-template-hacemos-page .headquarter .container-1 h2, p{ padding-top: 25px; }
+
+    .page-template-hacemos-page .headquarter .cards{ padding-top: 50px; display: flex; justify-content: center; align-items: flex-start; gap: 50px; flex-wrap: wrap; }
+
+    .page-template-hacemos-page .headquarter .cards .counter-item{ text-align: center; }
+
+    .page-template-hacemos-page .headquarter .cards .counter-item .count{ font-size: 48px; font-weight: 700; }
+
+    .page-template-hacemos-page .headquarter .cards .counter-item p{ margin-top: 5px; font-size: 18px; font-weight: 700; }
