@@ -1,0 +1,628 @@
+<?php
+get_header();
+$category = get_queried_object();
+?>
+
+<div id="primary" class="content-area" style="--themecolor: <?php the_field('color', $category); ?>;">
+	<main id="main" class="site-main">
+		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+		    <?php
+		    if(have_rows('introduccion', $category)) {
+		        while( have_rows('introduccion', $category)) : the_row();
+		        ?>
+		    	<section class="introduccion" style="background-image:url(<?php the_sub_field('imagen_fondo'); ?>);">
+		            <div class="container-1">
+		                <img class="logos" src="<?php the_sub_field('icono'); ?>">
+		                <img class="logos" src="<?php the_sub_field('logo'); ?>">
+		                <p><?php the_sub_field('titulo_principal'); ?></p>
+		                <a href="#soluciones" class="arrow"><img src="https://www.premiumdelevent.com/wp-content/uploads/2023/12/arrow-white-bottom.svg"></a>
+		            </div>
+		    	</section>
+		        <?php
+		        endwhile;
+		    }
+
+		    if(have_rows('soluciones', $category)) {
+		        while( have_rows('soluciones', $category)) : the_row();
+		        ?>
+		        <section class="soluciones" id="soluciones">
+		            <div class="container-1">
+		                <div class="text">
+		                    <div>
+		                        <h1 style="--themecolor: <?php the_field('color', $category); ?>;"><?php the_sub_field('titulo_secundario', false, false); ?></h1>
+		                        <p class="desc"><?php the_sub_field('descripcion'); ?></p>
+		                    </div>
+		                    <?php
+		                    if(have_rows('boton')) {
+		                        while( have_rows('boton')) : the_row();
+		                        ?>
+		                            <a class="button-generic d-desktop popmake-823"><?php the_sub_field('texto'); ?></a>
+		                        <?php
+		                        endwhile;
+		                    }
+		                    ?>
+		                </div>
+		                <div class="repeater">
+		                    <?php
+		                    if(have_rows('ventajas')) {
+		                        while( have_rows('ventajas')) : the_row(); ?>
+		                            <h2><?php the_sub_field('titulo'); ?></h2>
+		                            <?php
+		                            if(have_rows('repetidor')) {
+		                                while( have_rows('repetidor')) : the_row();
+		                                ?>
+		                                <div>
+		                                    <img src="<?php the_sub_field('icono'); ?>">
+		                                    <p><?php the_sub_field('texto'); ?></p>
+		                                </div>
+		                                <?php
+		                                endwhile;
+		                            }
+		                        endwhile;
+		                    }
+
+		                    if(have_rows('boton')) {
+		                        while( have_rows('boton')) : the_row();
+		                        ?>
+		                            <a class="button-generic d-mobil popmake-823"><?php the_sub_field('texto'); ?></a>
+		                        <?php
+		                        endwhile;
+		                    }
+		                    ?>
+		                </div>
+		            </div>
+		        </section>
+		        <?php
+		        endwhile;
+		    }
+
+		    if(have_rows('productos', $category)) {
+		        while( have_rows('productos', $category)) : the_row();
+		        ?>
+		        <section class="productos">
+		            <div class="container-1">
+
+						<?php
+
+						$second_query = new WP_Query( array(
+							'post_type' => 'product',
+							'posts_per_page' => 1120,
+							'tax_query' => array( array(
+						        'taxonomy' => 'product_cat',
+						        'field'    => 'slug',
+						        'terms'    => $category->slug,
+						        'operator' => 'IN',
+						    ) )
+						));
+
+						// Filters to show
+						$color_arr = [];
+						$familia_arr = [];
+						$material_arr = [];
+						$tamano_arr = [];
+						$tipo_arr = [];
+						$show_only = 16;
+
+						?>
+
+						<div class="productos-wrap" id="productos-wrap">
+			                <div class="productos-grid" id="productos-grid">
+			                	<?php
+			                	if($second_query->have_posts()) {
+		                			$iter = 0;
+									while ($second_query->have_posts() ) : $second_query->the_post(); 
+										global $product; 
+										$image = wp_get_attachment_image_src( get_post_thumbnail_id( $product->id ), 'single-post-thumbnail' );
+										$color = $product->get_attribute( 'color' );
+										$color = explode(" | ", $color);
+										$familia = $product->get_attribute( 'familia' );
+										$familia = explode(" | ", $familia);
+										$material = $product->get_attribute( 'material' );
+										$material = explode(" | ", $material);
+										$tamano = $product->get_attribute( 'tamano' );
+										$tamano = explode(" | ", $tamano);
+										$tipo = $product->get_attribute( 'tipo' );
+										$tipo = explode(" | ", $tipo);
+
+										for ($i = 0; $i < count($color); $i++) { 
+											array_push($color_arr, $color[$i]);
+										}
+
+										for ($i = 0; $i < count($familia); $i++) { 
+											array_push($familia_arr, $familia[$i]);
+										}
+
+										for ($i = 0; $i < count($material); $i++) { 
+											array_push($material_arr, $material[$i]);
+										}
+
+										for ($i = 0; $i < count($tamano); $i++) { 
+											array_push($tamano_arr, $tamano[$i]);
+										}
+
+										for ($i = 0; $i < count($tipo); $i++) { 
+											array_push($tipo_arr, $tipo[$i]);
+										}
+
+										?>
+										<div class="<?php if ($iter >= $show_only) { echo "display-none"; } ?>" tamano="<?php for($i = 0; $i < count($tamano); $i++) { echo $tamano[$i].","; } ?>" variations="<?php if ( $product->is_type( "variable" ) ) { echo "<p>Variaciones</p>"; echo "<div class='variations-wrap'>"; $temp42 = []; foreach ( $product->get_children( false ) as $child_id ) { $variation = wc_get_product( $child_id );  if ( ! $variation || ! $variation->exists() ) { continue; } $image_id = $variation->get_image_id(); $image_array = wp_get_attachment_image_src($image_id, 'full'); $image_src = $image_array[0]; if (in_array($variation->get_attribute( 'color' ), $temp42)) { echo "<div class='display-none' sku='".$variation->get_sku()."' children='has' tamano='".$variation->get_attribute( 'tamano' )."' color='".$variation->get_attribute( 'color' )."' material='".$variation->get_attribute( 'material' )."' image='".$image_src."' onclick='updateProductPopupImage(this, false, event)'>"; } else { echo "<div sku='".$variation->get_sku()."' tamano='".$variation->get_attribute( 'tamano' )."' color='".$variation->get_attribute( 'color' )."' material='".$variation->get_attribute( 'material' )."' image='".$image_src."' onclick='updateProductPopupImage(this, false, event)'>"; array_push($temp42, $variation->get_attribute( 'color' )); } echo "<p class='variation-color'><span class='".$variation->get_attribute( 'color' )."'>&nbsp;</span>".$variation->get_attribute( 'color' )."</p>"; echo "</div>"; } echo "</div>"; } ?>" onclick="productPopup(this)" color="<?php for($i = 0; $i < count($color); $i++) { echo $color[$i].","; } ?>" gallery="<?php $attachment_ids = $product->get_gallery_image_ids(); foreach( $attachment_ids as $attachment_id )  { echo wp_get_attachment_url( $attachment_id )."," ; }?>" ref="<?php if($product->get_sku() !== "" && $product->get_sku() !== null) { echo $product->get_sku(); } ?>" nombre="<?php the_title(); ?>" desc="<?php echo $product->post->post_excerpt; ?>" imagen="<?php echo $image[0]; ?>" tipo="<?php for($i = 0; $i < count($tipo); $i++) { echo $tipo[$i].","; } ?>" material="<?php for($i = 0; $i < count($material); $i++) { echo $material[$i].","; } ?>" familia="<?php for($i = 0; $i < count($familia); $i++) { echo $familia[$i].","; } ?>">
+											<div class="familia">
+												<?php 
+												if ($familia != null && $familia != "") {
+													$temp = explode(",", $familia);
+													for ($i = 0; $i < count($temp); $i++) {
+														?>
+														<p><?php echo $temp[$i]; ?></p>
+														<?php
+													}
+												}
+												?>
+											</div>
+											<?php
+											if ( $product->is_type( 'variable' ) ) {
+												$variation = wc_get_product( $child_id );  
+												if ( ! $variation || ! $variation->exists() ) { 
+													continue; 
+												}
+												$image_id = $variation->get_image_id(); 
+												$image_array = wp_get_attachment_image_src($image_id, 'full'); 
+												$image_src = $image_array[0]; 
+
+												?>
+												<img class="image" onerror="this.onerror=null; this.src='https://www.premiumdelevent.com/wp-content/uploads/2023/09/no-image.png'" src="<?php echo $image_src; ?>">
+												<?php
+											} else {
+												?>
+												<img class="image" onerror="this.onerror=null; this.src='https://www.premiumdelevent.com/wp-content/uploads/2023/09/no-image.png'" src="<?php echo $image[0]; ?>">
+												<?php
+											}
+											?>
+										    <p class="nombre"><?php the_title(); ?></p>
+										    <p class="sizes d-mobil"><?php echo $product->post->post_excerpt; ?></p>
+										    <div class="product-hover">
+										    	<p class="nombre"><?php the_title(); ?></p>
+												<p class="sizes"><?php echo $product->post->post_excerpt; ?></p>
+											    
+										    </div>
+										</div>
+									<?php 
+									$iter++;
+									endwhile; wp_reset_query();
+								}
+								?>
+			                </div>
+
+			                <div class="productos-filter">
+			                	<h2><?php the_sub_field('titulo'); ?></h2>
+								<?php
+
+								// Remove duplicates
+								$color_arr = array_unique($color_arr);
+								$familia_arr = array_unique($familia_arr);
+								$material_arr = array_unique($material_arr);
+								$tipo_arr = array_unique($tipo_arr);
+
+								// Reindex array
+								$color_arr = array_values($color_arr);
+								$familia_arr = array_values($familia_arr);
+								$material_arr = array_values($material_arr);
+								$tipo_arr = array_values($tipo_arr);
+
+								// Remove empty elements
+								$color_arr = array_filter($color_arr);
+								$familia_arr = array_filter($familia_arr);
+								$material_arr = array_filter($material_arr);
+								$tipo_arr = array_filter($tipo_arr);
+
+								$color = get_field('color', $category);
+
+								if (!empty($color_arr)) {
+									echo "<div class='filter-each'>";
+									echo "<select name='color_sel' id='color_sel' onchange='filterProducts()'>";
+									echo "<option value='all' selected>Todos los colores</option>";
+									for ($i = 0; $i < count($color_arr); $i++) {
+										if (!empty($color_arr[$i]) && $color_arr[$i] != null && $color_arr[$i] != "") {
+											echo "<option value='".$color_arr[$i]."'>".$color_arr[$i]."</option>";
+										}
+									}
+									echo "</select>";
+									echo '<svg style="--themecolor: '.$color.';" version="1.1" class="arrow" id="Capa_1" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 89.7 48.09" style="enable-background:new 0 0 89.7 48.09;" xml:space="preserve"><g transform="translate(0,-952.36218)"><path d="M45,999.33c1.16-0.06,2.27-0.52,3.12-1.31l39-36c2.03-1.88,2.15-5.05,0.27-7.08c-1.88-2.03-5.05-2.15-7.08-0.27c0,0,0,0,0,0l-35.59,32.84L9.12,954.68c-2.03-1.88-5.2-1.76-7.08,0.26c-1.88,2.03-1.76,5.2,0.26,7.08c0,0,0,0,0,0l39,36C42.31,998.94,43.64,999.41,45,999.33L45,999.33z"/></g></svg>';
+									echo "</div>";
+								}
+
+								if (!empty($material_arr)) {
+									echo "<div class='filter-each'>";
+									echo "<select name='material_sel' id='material_sel' onchange='filterProducts()'>";
+									echo "<option value='all' selected>Todos los materiales</option>";
+									for ($i = 0; $i < count($material_arr); $i++) {
+										if (!empty($material_arr[$i]) && $material_arr[$i] != null && $material_arr[$i] != "") {
+											echo "<option value='".$material_arr[$i]."'>".$material_arr[$i]."</option>";
+										}
+									}
+									echo "</select>";
+									echo '<svg style="--themecolor: '.$color.';" version="1.1" class="arrow" id="Capa_1" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 89.7 48.09" style="enable-background:new 0 0 89.7 48.09;" xml:space="preserve"><g transform="translate(0,-952.36218)"><path d="M45,999.33c1.16-0.06,2.27-0.52,3.12-1.31l39-36c2.03-1.88,2.15-5.05,0.27-7.08c-1.88-2.03-5.05-2.15-7.08-0.27c0,0,0,0,0,0l-35.59,32.84L9.12,954.68c-2.03-1.88-5.2-1.76-7.08,0.26c-1.88,2.03-1.76,5.2,0.26,7.08c0,0,0,0,0,0l39,36C42.31,998.94,43.64,999.41,45,999.33L45,999.33z"/></g></svg>';
+									echo "</div>";
+								}
+
+								if (!empty($tipo_arr)) {
+									echo "<div class='filter-each'>";
+									echo "<select name='tipo_sel' id='tipo_sel' onchange='filterProducts()'>";
+									echo "<option value='all' selected>Todos los tipos</option>";
+									for ($i = 0; $i < count($tipo_arr); $i++) {
+										if (!empty($tipo_arr[$i]) && $tipo_arr[$i] != null && $tipo_arr[$i] != "") {
+											echo "<option value='".$tipo_arr[$i]."'>".$tipo_arr[$i]."</option>";
+										}
+									}
+									echo "</select>";
+									echo '<svg style="--themecolor: '.$color.';" version="1.1" class="arrow" id="Capa_1" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:cc="http://creativecommons.org/ns#" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 89.7 48.09" style="enable-background:new 0 0 89.7 48.09;" xml:space="preserve"><g transform="translate(0,-952.36218)"><path d="M45,999.33c1.16-0.06,2.27-0.52,3.12-1.31l39-36c2.03-1.88,2.15-5.05,0.27-7.08c-1.88-2.03-5.05-2.15-7.08-0.27c0,0,0,0,0,0l-35.59,32.84L9.12,954.68c-2.03-1.88-5.2-1.76-7.08,0.26c-1.88,2.03-1.76,5.2,0.26,7.08c0,0,0,0,0,0l39,36C42.31,998.94,43.64,999.41,45,999.33L45,999.33z"/></g></svg>';
+									echo "</div>";
+								}
+
+								?>
+							</div>
+			            </div>
+
+		                <hr>
+		                <div class="showMore" id="showMore" onclick="showMore(this)">
+		                	<p style="color:<?php the_field('color', $category); ?>;">Cargar más productos</p>
+		                	<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:svg="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 100 125" style="enable-background:new 0 0 100 125;" xml:space="preserve">
+								<style type="text/css">
+								.st0{fill-rule:evenodd;clip-rule:evenodd;fill:<?php the_field('color', $category); ?>;}
+								</style>
+								<g transform="translate(0,-952.36218)">
+									<path class="st0" d="M49.8,992.4c1.2,0.1,2.3-0.3,3.2-1l39.9-30c2.2-1.6,2.7-4.8,1.1-7s-4.8-2.7-7-1.1c0,0-0.1,0.1-0.1,0.1   L50,981.1l-36.9-27.7c-2.2-1.7-5.3-1.3-7,0.9s-1.3,5.3,0.9,7c0,0,0.1,0.1,0.1,0.1l39.9,30C47.8,992,48.8,992.3,49.8,992.4   L49.8,992.4z"></path>
+									<path class="st0" d="M49.8,1077.4c1.2,0.1,2.3-0.3,3.2-1l39.9-30c2.2-1.6,2.7-4.8,1.1-7c-1.6-2.2-4.8-2.7-7-1.1   c0,0-0.1,0.1-0.1,0.1L50,1066.1l-36.9-27.7c-2.2-1.7-5.3-1.3-7,0.9c-1.7,2.2-1.3,5.3,0.9,7c0,0,0.1,0.1,0.1,0.1l39.9,30   C47.8,1077,48.8,1077.3,49.8,1077.4z"></path>
+									<path class="st0" d="M49.8,1034.9c1.2,0.1,2.3-0.3,3.2-1l39.9-30c2.2-1.6,2.7-4.8,1.1-7s-4.8-2.7-7-1.1c0,0-0.1,0.1-0.1,0.1   L50,1023.6l-36.9-27.7c-2.2-1.7-5.3-1.3-7,0.9s-1.3,5.3,0.9,7c0,0,0.1,0.1,0.1,0.1l39.9,30C47.8,1034.5,48.8,1034.8,49.8,1034.9   L49.8,1034.9z"></path>
+								</g>
+							</svg>
+		                </div>
+		            </div>
+		        </section>
+		        <?php
+		        endwhile;
+		    }
+		    ?>
+
+		    <script>
+
+	    	function filterProducts() {
+	    		var products = document.querySelectorAll(".productos-grid > div")
+
+				document.getElementById("showMore").classList.add("display-none")
+
+	    		for (let i = 0; i < products.length; i++) {
+					products[i].classList.remove("display-none")
+				}
+
+				var color_filter = null
+				var familia_filter = null
+				var material_filter = null
+				var tipo_filter = null
+
+				if (document.getElementById("color_sel")) {
+					color_filter = document.getElementById("color_sel").value
+				}
+
+				if (document.getElementById("familia_sel")) {
+					familia_filter = document.getElementById("familia_sel").value
+				}
+
+				if (document.getElementById("material_sel")) {
+					material_filter = document.getElementById("material_sel").value
+				}
+
+				if (document.getElementById("tipo_sel")) {
+					tipo_filter = document.getElementById("tipo_sel").value
+				}
+
+				for (let i = 0; i < products.length; i++) {
+					var color_flag = false;
+					var familia_flag = false;
+					var material_flag = false;
+					var tipo_flag = false;
+
+					var color = products[i].getAttribute("color").split(',')
+					var familia = products[i].getAttribute("familia").split(',')
+					var material = products[i].getAttribute("material").split(',')
+					var tipo = products[i].getAttribute("tipo").split(',')
+
+					if (color_filter != null) {
+						for (let j = 0; j < color.length; j++) {
+							if (color[j] == color_filter) {
+								color_flag = true
+							}
+							if (color_filter == "all") {
+								color_flag = true
+							}
+						}
+					} else {
+						color_flag = true;
+					}
+
+					if (familia_filter != null) {
+						for (let j = 0; j < familia.length; j++) {
+							if (familia[j] == familia_filter) {
+								familia_flag = true
+							}
+							if (familia_filter == "all") {
+								familia_flag = true
+							}
+						}
+					} else {
+						familia_flag = true;
+					}
+
+					if (material_filter != null) {
+						for (let j = 0; j < material.length; j++) {
+							if (material[j] == material_filter) {
+								material_flag = true
+							}
+							if (material_filter == "all") {
+								material_flag = true
+							}
+						}
+					} else {
+						material_flag = true;
+					}
+
+					if (tipo_filter != null) {
+						for (let j = 0; j < tipo.length; j++) {
+							if (tipo[j] == tipo_filter) {
+								tipo_flag = true
+							}
+							if (tipo_filter == "all") {
+								tipo_flag = true
+							}
+						}
+					} else {
+						tipo_flag = true;
+					}
+
+					if (color_flag == false || familia_flag == false || material_flag == false || tipo_flag == false) {
+						products[i].classList.add("display-none")
+					} else if (color_flag == true && familia_flag == true && material_flag == true && tipo_flag == true) {
+						products[i].classList.remove("display-none")
+					}
+				}
+	    	}
+
+	    	var show_index = 16;
+	    	var prod = null;
+
+			document.addEventListener("DOMContentLoaded", function(event) { 
+				window.event.stopPropagation();
+
+				prod = document.querySelectorAll(".tax-product_cat .productos .productos-grid > div")
+			});
+
+	    	function showMore(dom) {
+				if (show_index > prod.length) {
+	    			dom.classList.add("display-none")
+	    		}
+
+				for (let i = 0; i < show_index; i++) {
+					prod[i].classList.remove("display-none")
+				}
+
+				show_index += 16;
+	    	}
+
+		    </script>
+
+			<section class="descripcion-baras">
+			    <div class="container-2">
+			    	<p><?php the_field("descripcion", $category); ?></p>
+			    </div>
+			</section>
+
+		    <?php
+		    if(have_rows('ejemplos', $category)) {
+		        while( have_rows('ejemplos', $category)) : the_row();
+		        ?>
+		        <section class="ejemplos">
+		            <div class="container-1">
+		                <div class="general-flex">
+		                    <h2><?php the_sub_field('titulo', false, false); ?></h2>
+		                    <hr>
+		                </div>
+		                <div class="general-grid">
+		                <?php
+		                if(have_rows('repetidor')) {
+		                    while( have_rows('repetidor')) : the_row();
+		                    ?>
+		                    <a href="<?php the_sub_field('enlace'); ?>" style="background-image:url(<?php the_sub_field('imagen'); ?>);">
+		                        <p><?php the_sub_field('texto'); ?></p>
+		                    </a>
+		                    <?php
+		                    endwhile;
+		                }
+		                ?>
+		                </div>
+		                <?php /*
+		                if(have_rows('boton')) {
+		                    while( have_rows('boton')) : the_row();
+		                    
+		                        <a class="button-generic" href="<?php the_sub_field('enlace'); "><?php the_sub_field('texto'); </a>
+		                    <?php
+		                    endwhile;
+		                }
+		                */ ?>
+		            </div>
+		        </section>
+		        <?php
+		        endwhile;
+		    }
+		    ?>
+
+		    <script>
+
+		    $(document).ready(function(){
+		    	if (window.matchMedia("(max-width: 768px)").matches) {
+				  $('.ejemplos .general-grid').slick({
+			            infinite: true,
+			            autoplay:false,
+			            autoplaySpeed:3000,
+			            speed: 300,
+			            slidesToShow: 1,
+			            centerMode: false,
+			            variableWidth: true,
+			            dots: false,
+			            prevArrow: false,
+			            nextArrow: false,
+			            mobileFirst: true,
+			            responsive: [{
+			              breakpoint: 768,
+			              settings: {
+			                settings: "unslick"
+			              }
+			            }]
+			        });
+				} 
+		    });
+
+		    </script>
+
+		</article>
+	</main>
+</div>
+<?php
+get_footer();
+?>
+
+
+<!--
+
+	// Product Popup
+	function productPopup(dom, close = false) {
+		if (close) {
+			document.body.classList.remove("lock2");
+			document.getElementById("product-popup-gallery-list").innerHTML = "" 
+			document.getElementById("menu-overlay").classList.toggle("menu-overlay-opacity");
+			document.getElementById("product-popup").classList.toggle("product-popup-opacity");
+			setTimeout(function(){
+				document.getElementById("menu-overlay").classList.toggle("menu-overlay-display");
+				document.getElementById("product-popup").classList.toggle("product-popup-display");
+			}, 250);
+		} else {
+			document.body.classList.add("lock2");
+			var attr_html = "";
+			if (dom.getAttribute("tamano") && dom.getAttribute("tamano") != "," && dom.getAttribute("tamano") != "") {
+				attr_html += "<p id='tamano-popup'></p>";
+			}
+
+			attr_html += "<span id='ref-popup'></span><br>";
+
+			if (dom.getAttribute("variations")) {
+				attr_html += "<div class='variations'>";
+				attr_html += dom.getAttribute("variations");
+				attr_html += "</div>";
+			}
+			
+			var images = dom.getAttribute("gallery").split(',');
+			for (let i = 0; i < images.length; i++) {
+				if (images[i] != null && images[i] != "") {
+					document.getElementById("product-popup-gallery-list").insertAdjacentHTML("beforeend", "<img src=" + images[i] + ">");
+				}
+			}
+
+			document.getElementById("product-popup-image").setAttribute("src", dom.getAttribute("imagen"))
+			document.getElementById("product-popup-title").textContent = dom.getAttribute("nombre")
+			document.getElementById("product-popup-desc").textContent = dom.getAttribute("desc")
+			document.getElementById("product-popup-attr").innerHTML = attr_html
+
+			document.getElementById("menu-overlay").classList.toggle("menu-overlay-display");
+			document.getElementById("product-popup").classList.toggle("product-popup-display");
+			setTimeout(function(){
+				document.getElementById("menu-overlay").classList.toggle("menu-overlay-opacity");
+				document.getElementById("product-popup").classList.toggle("product-popup-opacity");
+			}, 250);
+
+			document.getElementById("menu-overlay").setAttribute("onclick", "productPopup(null, true)")
+
+			if (dom.getAttribute("tamano") && dom.getAttribute("tamano") != "" && dom.getAttribute("tamano") != ",") {
+				document.getElementById("tamano-popup").textContent = "Tamaño: " + dom.getAttribute("tamano").replace(/,\s*$/, "")
+			}
+			if (dom.getAttribute("ref") && dom.getAttribute("ref") != "") {
+				document.getElementById("ref-popup").textContent = "REF: " + dom.getAttribute("ref").replace(/,\s*$/, "")
+			}
+
+			if (document.querySelector(".variations-wrap > div:not(.separator):first-child")) {
+				document.querySelector(".variations-wrap > div:not(.separator):first-child").click()
+				var children = document.querySelector(".variations-wrap > div:not(.separator):first-child .children-wrap > .children-variation:first-child")
+				if (children) {
+					children.click()
+				}
+			}
+		}
+	}
+
+	function updateProductPopupImage(dom, children = false, event) {
+		if (!e) var e = window.event;
+		e.cancelBubble = true;
+		if (e.stopPropagation) e.stopPropagation();
+
+		if (document.querySelector(".variations-wrap > div:not(.separator).active")) {
+			document.querySelector(".variations-wrap > div:not(.separator).active").classList.remove("active")
+		}
+
+		if (document.querySelector(".children-variation.active")) {
+			document.querySelector(".children-variation.active").classList.remove("active")
+		}
+
+		var childom = null;
+		var ider = null;
+
+		if (!children) { 
+			var color = dom.getAttribute("color")
+			childom = document.querySelectorAll(".variations-wrap > div[color='" + color + "'][children='has']")
+			var deleting = document.querySelectorAll(".children-wrap")
+			for (let i = 0; i < deleting.length; i++) {
+				deleting[i].remove();
+			}
+		}
+
+		if (childom !== null && childom.length !== 0) {
+			var htmltemp = "<div class='children-wrap'>";
+
+			if (!dom.getAttribute("material")) {
+				htmltemp += "<div ider='tag-0' class='children-variation' sku='" + dom.getAttribute("sku") + "' tamano='" + dom.getAttribute("tamano") + "' image='" + dom.getAttribute("image") + "' onclick='updateProductPopupImage(this, true, event)'>" + dom.getAttribute("tamano") + "</div>";
+			} else {
+				htmltemp += "<div ider='tag-0' class='children-variation' sku='" + dom.getAttribute("sku") + "' tamano='" + dom.getAttribute("tamano") + "' image='" + dom.getAttribute("image") + "' onclick='updateProductPopupImage(this, true, event)'>" + dom.getAttribute("material") + "</div>";
+			}
+			for (let i = 0; i < childom.length; i++) {
+				if (!childom[i].getAttribute("material")) {
+					htmltemp += "<div ider='tag-" + (i+1) + "' class='children-variation' sku='" + childom[i].getAttribute("sku") + "' tamano='" + childom[i].getAttribute("tamano") + "' image='" + childom[i].getAttribute("image") + "' onclick='updateProductPopupImage(this, true, event)'>" + childom[i].getAttribute("tamano") + "</div>";
+				} else {
+					htmltemp += "<div ider='tag-" + (i+1) + "' class='children-variation' sku='" + childom[i].getAttribute("sku") + "' tamano='" + childom[i].getAttribute("tamano") + "' image='" + childom[i].getAttribute("image") + "' onclick='updateProductPopupImage(this, true, event)'>" + childom[i].getAttribute("material") + "</div>";
+				}
+			}
+			htmltemp += "</div>";
+			dom.insertAdjacentHTML("beforeend", htmltemp);
+		} else {
+			document.getElementById("product-popup-image").setAttribute("src", dom.getAttribute("image"))
+			ider = dom.getAttribute("ider")
+		}
+
+		if (children) {
+			document.querySelector(".children-variation[ider='" + ider + "']").classList.add("active")
+
+			if (dom.getAttribute("sku") && dom.getAttribute("sku") != "") {
+				document.getElementById("ref-popup").textContent = "REF: " + dom.getAttribute("sku")
+			}
+			
+			setTimeout(function(){  
+				if (dom.getAttribute("tamano") && dom.getAttribute("tamano") != "" && dom.getAttribute("tamano") != ",") {
+					document.getElementById("tamano-popup").textContent = "Tamaño: " + dom.getAttribute("tamano")
+				}
+			}, 100);
+		} else {
+			if (dom.getAttribute("sku") && dom.getAttribute("sku") != "") {
+				document.getElementById("ref-popup").textContent = "REF: " + dom.getAttribute("sku")
+			}
+			if (dom.getAttribute("tamano") && dom.getAttribute("tamano") != "" && dom.getAttribute("tamano") != ",") {
+				document.getElementById("tamano-popup").textContent = "Tamaño: " + dom.getAttribute("tamano")
+			}
+		}
+	}
+
+-->
