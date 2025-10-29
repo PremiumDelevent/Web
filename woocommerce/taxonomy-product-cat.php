@@ -1034,7 +1034,7 @@ function get_tipos_categoria($category_slug) {
 
 						<div class="container-1">
 
-							<h2><?php _e('Explora nuestros productos por categoría', 'ws'); ?></h2>
+							<h2><?php _e('Explore our products by category', 'ws'); ?></h2>
 
 							<div class="tipos-grid">
 
