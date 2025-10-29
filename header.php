@@ -958,16 +958,16 @@ $category = get_queried_object();
 
                 }
                 
-                if(dom.getAttribute("product_type") == "simple"){
+                if (dom.getAttribute("product_type") == "simple") {
+                    const ref = dom.getAttribute("ref");
 
-                    if((dom.getAttribute("ref") != "") && (dom.getAttribute("ref") != ",")){
-
-                        attr_info_product += "<div style = 'display: flex; align-items: center; gap: 10px;'> <strong> <?php _e('Reference: ', 'ws'); ?> </strong> </p> <p class = 'ref'>";
-                        
-                        attr_info_product += dom.getAttribute("ref");
-
-                        attr_info_product += "</div> </p>";
-
+                    if (ref && ref !== "," && ref !== "") {
+                        attr_info_product += `
+                        <div style="display: flex; align-items: center; gap: 10px; padding-top: 30px;">
+                            <strong><?php _e('Reference:', 'ws'); ?></strong>
+                            <p class="ref" style="margin: 0; padding: 0; line-height: 1;">${ref}</p>
+                        </div>
+                        `;
                     }
                 }
 

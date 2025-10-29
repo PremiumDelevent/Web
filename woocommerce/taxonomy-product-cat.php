@@ -1417,7 +1417,7 @@ function get_tipos_categoria($category_slug) {
 
 													<p class="nombre"><?php the_title(); ?></p>
 
-													<p class="sizes"><?php echo $size; ?></p>
+													<p class="sizes" style="padding-top: 20px; "><?php echo $size; ?></p>
 
 												</div>
 
@@ -1543,37 +1543,19 @@ function get_tipos_categoria($category_slug) {
 
 						<?php
 
-						// Aquí puedes agregar campos ACF específicos para cada tipo
+						// Llamar campos ACF específicos para cada tipo
 
 						// Por ejemplo: titulo_h2_sillas, texto_p_sillas, etc.
 
-						$tipo_slug_clean = str_replace('-', '_', $tipo_actual);
+						if (get_field("titulo_h2_".$tipo_actual, $category)) {
 
-						
-
-						if (get_field("titulo_h2_".$tipo_slug_clean, $category)) {
-
-							echo '<h2>'.get_field("titulo_h2_".$tipo_slug_clean, $category).'</h2>';
-
-						} else {
-
-							// Título por defecto
-
-							echo '<h2>'.sprintf(__('%s de %s', 'ws'), $nombre_tipo, $category->name).'</h2>';
+							echo '<h2>'.get_field("titulo_h2_".$tipo_actual, $category).'</h2>';
 
 						}
 
-						
+						if (get_field("texto_p_".$tipo_actual, $category)) {
 
-						if (get_field("texto_p_".$tipo_slug_clean, $category)) {
-
-							echo '<p>'.get_field("texto_p_".$tipo_slug_clean, $category).'</p>';
-
-						} else {
-
-							// Texto por defecto
-
-							echo '<p>'.sprintf(__('Descubre nuestra amplia selección de %s para eventos. Productos de alta calidad que se adaptan a cualquier tipo de celebración.', 'ws'), strtolower($nombre_tipo)).'</p>';
+							echo '<p>'.get_field("texto_p_".$tipo_actual, $category).'</p>';
 
 						}
 
