@@ -73,7 +73,7 @@ $current_lang = apply_filters( 'wpml_object_id', 14, 'post' );
             <div class="container-1">
 
                 <div class="eventos-header">
-                    <h1><?php _e("Our events", "ws") ?></h1>
+                    <h1><strong><?php _e("Our events", "ws") ?></strong></h1>
                     <input type="text" id="buscador-eventos" placeholder="<?php _e("Search events...", "ws") ?>" />
                 </div>
 
