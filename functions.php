@@ -982,7 +982,37 @@ function get_event_selected_products($event_id) {
             $selected_products[] = $product;
         }
     }
-    
+
+    // Orden de prioridad de categorías
+    $priority = [
+		'TABURETES' => 1,
+		'SILLAS' => 2,
+		'SILLONES Y SOFAS' => 3,
+        'MESAS' => 4,
+        'MOSTRADOR Y ESTANTES' => 5,
+    ];
+
+    // Ordenar según prioridad
+    usort($selected_products, function ($a, $b) use ($priority) {
+        $a_cat = strtoupper($a['itemCategoryCode']);
+        $b_cat = strtoupper($b['itemCategoryCode']);
+        
+        // Buscar categoría base (por si tiene variantes tipo "MOSTRADOR Y ESTANTES")
+        foreach ($priority as $key => $value) {
+            if (strpos($a_cat, $key) !== false) $a_cat = $key;
+            if (strpos($b_cat, $key) !== false) $b_cat = $key;
+        }
+
+        $a_priority = $priority[$a_cat] ?? PHP_INT_MAX;
+        $b_priority = $priority[$b_cat] ?? PHP_INT_MAX;
+
+        if ($a_priority === $b_priority) {
+            return strcmp($a['displayName'], $b['displayName']); // orden secundario por nombre
+        }
+
+        return $a_priority <=> $b_priority;
+    });
+
     return $selected_products;
 }
 
