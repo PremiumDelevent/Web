@@ -180,7 +180,7 @@ get_header();
                         // Usar la función helper para obtener productos seleccionados
 
                         $productos_seleccionados = get_event_selected_products(get_the_ID());
-                         
+                        
                         
                         if (!empty($productos_seleccionados)) :
                            
@@ -277,11 +277,7 @@ get_header();
 
                                         <!-- Mostrar stock -->
 
-                                        <div class="producto-stock">
-
-                                            📦 <?php _e("Available stock", "ws") ?>: <?php echo $stock_disponible_num; ?>
-
-                                        </div>
+                                        <div class="producto-stock"></div>
 
                                     </div>
 
